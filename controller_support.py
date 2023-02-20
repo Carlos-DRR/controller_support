@@ -3,6 +3,7 @@ import pydirectinput as pdi
 import pyautogui as pag
 from multiprocessing import Process
 import time
+
 weight = 10
 tolerance = 2
 screen_offset = 200
@@ -23,7 +24,7 @@ def minmax(val):
     maximo = 255
     return 2 * ((val - minimo) / (maximo - minimo)) - 1
 
-def get_cursor_direction():
+def get_mouse_cursor_position():
     while True:
         datastream = gamepad.read(64)
         if datastream:
@@ -53,7 +54,7 @@ def get_cursor_direction():
                 axis_y = 0
             pag.move(axis_x, axis_y)
 
-def get_click():
+def get_clicks():
     while True:
         datastream = gamepad.read(64)
         if datastream:
@@ -61,26 +62,26 @@ def get_click():
             if click_r1:
                 pag.mouseDown(button='right')
                 pag.mouseUp(button='right')
-                time.sleep(0.5)
+                time.sleep(0.4)
         
             click_l1 = datastream[6] == 1
             if click_l1:
                 pag.mouseDown(button='left')
                 pag.mouseUp(button='left')
-                time.sleep(0.5)
+                time.sleep(0.4)
 
-def get_buttons():
+def get_skill_buttons():
     while True:
         datastream = gamepad.read(64)
         if datastream:
             btn = datastream[5] # 136 ta apertado o triangulo
-            trigger_l2 = datastream[8] > 20 # 0 a 255
-            trigger_r2 = datastream[9] > 20 # 0 a 255
+            #print('btn:', datastream[6])
+            #datastream[6] F = 64, D = 128
             # 136 ta apertado
             # 24 é quadrado
             # x é 40
             # bolinha é 72
-
+            
             match btn:
                 case 40:
                     pdi.keyDown('w')
@@ -105,19 +106,54 @@ def get_buttons():
                     pdi.keyUp('e')
                     #print('e')
                     #time.sleep(0.15)
-            if trigger_l2:
-                #pdi.keyDown('space')
-                pdi.press('space')
-                #time.sleep(0.2)
-            if trigger_r2:
-                pdi.press('tab')
-                #pdi.keyUp('tab')
-                #time.sleep(0.2)
 
-                
+
+def get_spell_buttons():
+    while True:
+        datastream = gamepad.read(64)
+        if datastream:
+            key = datastream[6]
+            match key:
+                case 64:
+                    pdi.keyDown('d')
+                    pdi.keyUp('d')
+                    time.sleep(0.15)
+
+                case 128:
+                    pdi.keyDown('f')
+                    pdi.keyUp('f')
+                    time.sleep(0.15)
+
+def get_utilities():
+    while True:
+        datastream = gamepad.read(64)
+        if datastream:
+            #print(datastream[5]) # 0 é seta pra cima
+            key = datastream[5]
+            match key:
+                case 0: # seta pra cima
+                    pdi.keyDown('4')
+                    pdi.keyUp('4')
+                    time.sleep(0.3)
+
+                case 4: # seta pra baixo
+                    pdi.keyDown('1')
+                    pdi.keyUp('1')
+                    time.sleep(0.3)
+                case 6: # seta esquerda
+                    pdi.keyDown('b')
+                    pdi.keyUp('b')
+                    time.sleep(0.3)
+                case 2: # seta direita
+                    pdi.keyDown('p')
+                    pdi.keyUp('p')
+                    time.sleep(0.3)
+
 
 if __name__ == '__main__': 
-    Process(target=get_cursor_direction).start() 
-    Process(target=get_click).start()
-    Process(target=get_buttons).start()
+    Process(target=get_mouse_cursor_position).start() 
+    Process(target=get_clicks).start()
+    Process(target=get_skill_buttons).start()
+    Process(target=get_spell_buttons).start()
+    Process(target=get_utilities).start()
 
