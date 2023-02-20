@@ -4,7 +4,7 @@ import pyautogui as pag
 from multiprocessing import Process
 import time
 
-weight = 10
+weight = 7
 tolerance = 2
 screen_offset = 200
 pag.PAUSE = 0
@@ -148,7 +148,15 @@ def get_utilities():
                     pdi.keyDown('p')
                     pdi.keyUp('p')
                     time.sleep(0.3)
-
+                case _ if key < 20: 
+                    while(datastream and datastream[8] > 20):# centralizar no personagem (espaço)
+                        pdi.keyDown("space")
+                        datastream = gamepad.read(64)
+                    pdi.keyUp("space")
+                    while(datastream and datastream[9] > 20):# tab
+                        pdi.keyDown("tab")
+                        datastream = gamepad.read(64)
+                    pdi.keyUp("tab")
 
 if __name__ == '__main__': 
     Process(target=get_mouse_cursor_position).start() 
