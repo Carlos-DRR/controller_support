@@ -8,6 +8,7 @@ weight = 7
 tolerance = 2
 screen_offset = 70
 pag.PAUSE = 0
+pag.FAILSAFE = False
 
 gamepad = hid.device()
 gamepad.open(0x054c, 0x05c4)
@@ -17,11 +18,23 @@ f = open("C:/Users/carlo/Desktop/controller_support/config.json")
 data_json = json.load(f)
 
 f.close()
+
+# verifica se a posição desejada pelo input é possível em cada eixo (x, y)
+# portanto são quatro possibilidades: (true, true), (true, false),(false, true), (false, false)
+# Os inputs são executados apenas quando e posição é válida (dentro da tela) ex: (true, false) = em x é aceito o input e y é zero
 def check_valid_cursor_direction(axis_x, axis_y):
     screen_width = pag.position()[0]
     screen_height = pag.position()[1]
-    #print(screen_width + axis_x, screen_height + axis_y)
-    return pag.onScreen(screen_width + axis_x, screen_height + axis_y)
+    axis_x_valid = pag.onScreen(screen_width + axis_x, 0)
+    axis_y_valid = pag.onScreen(0, screen_height + axis_y)
+    if not axis_x_valid and not axis_y_valid:
+        return 0, 0
+    if axis_x_valid and axis_y_valid:
+        return axis_x, axis_y
+    elif not axis_x_valid:
+        return 0, axis_y
+    else:
+        return axis_x, 0
 
 def minmax(val):
     minimo = 0
@@ -52,10 +65,7 @@ def get_mouse_cursor_position():
 
             axis_y = int(axis_y * weight)
             
-            
-            if not check_valid_cursor_direction(axis_x, axis_y):
-                axis_x = 0
-                axis_y = 0
+            axis_x, axis_y = check_valid_cursor_direction(axis_x, axis_y)
             pag.move(axis_x, axis_y)
 
 def add_times_pressed(times_pressed):
