@@ -1,8 +1,1 @@
-- tentar adicionar um buffer de inputs, ver se resolve:
-	- adicionar fila de datastream e ir consumindo cada um	
-
 - corrigir limites na tela pra não extrapolar
-
-- colocar clique normal sem o time.sleep()
-
-- colocar cada loop do while em um tempo específico por delta time, utc sei la

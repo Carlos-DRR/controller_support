@@ -2,7 +2,6 @@ import hid
 import pydirectinput as pdi
 import pyautogui as pag
 from multiprocessing import Process
-import time
 import json
 
 weight = 7
@@ -59,25 +58,50 @@ def get_mouse_cursor_position():
                 axis_y = 0
             pag.move(axis_x, axis_y)
 
+def add_times_pressed(times_pressed):
+    if times_pressed > 1:
+        return times_pressed
+    elif times_pressed <= 1:
+        return times_pressed + 1
+
+
 def get_clicks():
+    times_clicked_right = 0
+    times_clicked_left = 0
     while True:
         datastream = gamepad.read(64)
         if datastream:
 
             click_r1 = datastream[data_json["cursor_btns"]["right_btn"]["id"]] == data_json["cursor_btns"]["right_btn"]["values"]["right_click"]
             if click_r1:
-                pag.mouseDown(button='right')
-                pag.mouseUp(button='right')
-                time.sleep(0.4)
-        
+                #times_clicked_right += 1
+                times_clicked_right = add_times_pressed(times_clicked_right)
+                if(times_clicked_right == 1):
+                    pag.mouseDown(button='right')
+            else:    
+                if times_clicked_right >= 1:
+                    times_clicked_right = 0
+                    pag.mouseUp(button='right')
+            
+            
             click_l1 = datastream[data_json["cursor_btns"]["left_btn"]["id"]] == data_json["cursor_btns"]["left_btn"]["values"]["left_click"]
             if click_l1:
-                pag.mouseDown(button='left')
-                pag.mouseUp(button='left')
-                time.sleep(0.4)
+                #times_clicked_left += 1
+                times_clicked_left = add_times_pressed(times_clicked_left)
+                if(times_clicked_left == 1):
+                    pag.mouseDown(button='left')
+                    
+            else:
+                if times_clicked_left >= 1:
+                    times_clicked_left = 0
+                    pag.mouseUp(button='left')
 
 def get_skill_buttons():
     # datastream[data_json["skill_btns"]["btn_1"]["id"]]
+    times_pressed_skill_1 = 0
+    times_pressed_skill_2 = 0
+    times_pressed_skill_3 = 0
+    times_pressed_skill_4 = 0
     while True:
         datastream = gamepad.read(64)
         if datastream:
@@ -89,66 +113,132 @@ def get_skill_buttons():
             # x é 40
             # bolinha é 72
             if (btn == data_json["skill_btns"]["btn_1"]["values"]["skill_q"]):
-                pdi.keyDown(data_json["skill_btns"]["btn_1"]["keys"][0])
-                pdi.keyUp(data_json["skill_btns"]["btn_1"]["keys"][0])
-            elif (btn == data_json["skill_btns"]["btn_1"]["values"]["skill_w"]):
-                pdi.keyDown(data_json["skill_btns"]["btn_1"]["keys"][1])
-                pdi.keyUp(data_json["skill_btns"]["btn_1"]["keys"][1])
-            elif (btn == data_json["skill_btns"]["btn_1"]["values"]["skill_e"]):
-                pdi.keyDown(data_json["skill_btns"]["btn_1"]["keys"][2])
-                pdi.keyUp(data_json["skill_btns"]["btn_1"]["keys"][2])
-            elif (btn == data_json["skill_btns"]["btn_1"]["values"]["skill_r"]):
-                pdi.keyDown(data_json["skill_btns"]["btn_1"]["keys"][3])
-                pdi.keyUp(data_json["skill_btns"]["btn_1"]["keys"][3])
+                times_pressed_skill_1 += add_times_pressed(times_pressed_skill_1)
+                if(times_pressed_skill_1 == 1):
+                    pdi.keyDown(data_json["skill_btns"]["btn_1"]["keys"][0])
+            else:
+                if(times_pressed_skill_1 >= 1):
+                    times_pressed_skill_1 = 0
+                    pdi.keyUp(data_json["skill_btns"]["btn_1"]["keys"][0])
+
+            if (btn == data_json["skill_btns"]["btn_1"]["values"]["skill_w"]):
+                times_pressed_skill_2 += add_times_pressed(times_pressed_skill_2)
+                if(times_pressed_skill_2 == 1):
+                    pdi.keyDown(data_json["skill_btns"]["btn_1"]["keys"][1])
+            else:
+                if(times_pressed_skill_2 >= 1):
+                    times_pressed_skill_2 = 0
+                    pdi.keyUp(data_json["skill_btns"]["btn_1"]["keys"][1])
+            if (btn == data_json["skill_btns"]["btn_1"]["values"]["skill_e"]):
+                times_pressed_skill_3 += add_times_pressed(times_pressed_skill_3)
+                if(times_pressed_skill_3 == 1):
+                    pdi.keyDown(data_json["skill_btns"]["btn_1"]["keys"][2])
+            else:
+                if(times_pressed_skill_3 >= 1):
+                    times_pressed_skill_3 = 0
+                    pdi.keyUp(data_json["skill_btns"]["btn_1"]["keys"][2])
+            if (btn == data_json["skill_btns"]["btn_1"]["values"]["skill_r"]):
+                times_pressed_skill_4 += add_times_pressed(times_pressed_skill_4)
+                if(times_pressed_skill_4 == 1):
+                    pdi.keyDown(data_json["skill_btns"]["btn_1"]["keys"][3])
+            else:
+                if(times_pressed_skill_4 >= 1):
+                    times_pressed_skill_4 = 0
+                    pdi.keyUp(data_json["skill_btns"]["btn_1"]["keys"][3])
 
 
 def get_spell_buttons():
+    times_pressed_spell1 = 0
+    times_pressed_spell2 = 0
     while True:
         datastream = gamepad.read(64)
         if datastream:
             #datastream[data_json["spell_btns"]["btn_1"]["id"]]
             key = datastream[data_json["spell_btns"]["btn_1"]["id"]]
             if key == data_json["spell_btns"]["btn_1"]["values"]["spell_1"]:
-                pdi.keyDown(data_json["spell_btns"]["btn_1"]["keys"][0])
-                pdi.keyUp(data_json["spell_btns"]["btn_1"]["keys"][0])
-                time.sleep(0.15)
-            elif key == data_json["spell_btns"]["btn_1"]["values"]["spell_2"]:
-                pdi.keyDown(data_json["spell_btns"]["btn_1"]["keys"][1])
-                pdi.keyUp(data_json["spell_btns"]["btn_1"]["keys"][1])
-                time.sleep(0.15)
+                times_pressed_spell1 += add_times_pressed(times_pressed_spell1)
+                if(times_pressed_spell1 == 1):
+                    pdi.keyDown(data_json["spell_btns"]["btn_1"]["keys"][0])
+            else:
+                if(times_pressed_spell1 >= 1):
+                    times_pressed_spell1 = 0
+                    pdi.keyUp(data_json["spell_btns"]["btn_1"]["keys"][0])
+
+            if key == data_json["spell_btns"]["btn_1"]["values"]["spell_2"]:
+                times_pressed_spell2 += add_times_pressed(times_pressed_spell2)
+                if(times_pressed_spell2 == 1):
+                    pdi.keyDown(data_json["spell_btns"]["btn_1"]["keys"][1])
+            else:
+                if(times_pressed_spell2 >= 1):
+                    times_pressed_spell2 = 0                
+                    pdi.keyUp(data_json["spell_btns"]["btn_1"]["keys"][1])
                     
 
-def get_utilities():
+def get_utilities():        
+    times_pressed_utl_1 = 0
+    times_pressed_utl_2 = 0
+    times_pressed_utl_3 = 0
+    times_pressed_utl_4 = 0
+    times_pressed_utl_5 = 0
+    times_pressed_utl_6 = 0
     while True:
         datastream = gamepad.read(64)
         if datastream:
             #datastream[data_json["utilities_btns"]["btn_1"]["id"]]
             key = datastream[data_json["utilities_btns"]["btn_1"]["id"]]
             if key == data_json["utilities_btns"]["btn_1"]["values"]["arrow_1"]:
-                pdi.keyDown('4')
-                pdi.keyUp('4')
-                time.sleep(0.3)
-            elif key == data_json["utilities_btns"]["btn_1"]["values"]["arrow_2"]:
-                pdi.keyDown('1')
-                pdi.keyUp('1')
-                time.sleep(0.3)
-            elif key == data_json["utilities_btns"]["btn_1"]["values"]["arrow_3"]:
-                pdi.keyDown('b')
-                pdi.keyUp('b')
-                time.sleep(0.3)
-            elif key == data_json["utilities_btns"]["btn_1"]["values"]["arrow_4"]:
-                pdi.keyDown('p')
-                pdi.keyUp('p')
-                time.sleep(0.3)
-            elif key < data_json["utilities_btns"]["btn_2"]["values"]["utl_1"]:
-                while(datastream and datastream[data_json["utilities_btns"]["btn_2"]["id"]] > data_json["utilities_btns"]["btn_2"]["values"]["utl_1"]):# centralizar no personagem (espaço)
+                times_pressed_utl_1 = add_times_pressed(times_pressed_utl_1)
+                if(times_pressed_utl_1 == 1):
+                    pdi.press('4')
+            else:
+                if(times_pressed_utl_1 >= 1):
+                    times_pressed_utl_1 = 0                  
+                    pdi.keyUp('4')
+
+            if key == data_json["utilities_btns"]["btn_1"]["values"]["arrow_2"]:
+                times_pressed_utl_2 = add_times_pressed(times_pressed_utl_2)
+                if(times_pressed_utl_2 == 1):
+                    pdi.keyDown('1')
+            else:
+                if(times_pressed_utl_2 >= 1):
+                    times_pressed_utl_2 = 0
+                    pdi.keyUp('1')
+
+            if key == data_json["utilities_btns"]["btn_1"]["values"]["arrow_3"]:
+                times_pressed_utl_3 = add_times_pressed(times_pressed_utl_3)
+                if(times_pressed_utl_3 == 1):
+                    pdi.keyDown('b')
+            else:
+                if(times_pressed_utl_3 >= 1):
+                    times_pressed_utl_3 = 0
+                    pdi.keyUp('b')
+
+            if key == data_json["utilities_btns"]["btn_1"]["values"]["arrow_4"]:
+                times_pressed_utl_4 = add_times_pressed(times_pressed_utl_4)
+                if(times_pressed_utl_4 == 1):
+                    pdi.keyDown('p')
+            else:
+                if(times_pressed_utl_4 >= 1):
+                    times_pressed_utl_4 = 0
+                    pdi.keyUp('p')
+                
+            if datastream[data_json["utilities_btns"]["btn_2"]["id"]] > data_json["utilities_btns"]["btn_2"]["values"]["utl_1"]:# centralizar no personagem (espaço)
+                times_pressed_utl_5 = add_times_pressed(times_pressed_utl_5)
+                if(times_pressed_utl_5 == 1):
                     pdi.keyDown(data_json["utilities_btns"]["btn_2"]["keys"][0])
-                    datastream = gamepad.read(64)
-                pdi.keyUp(data_json["utilities_btns"]["btn_2"]["keys"][0])
-                while(datastream and datastream[data_json["utilities_btns"]["btn_3"]["id"]] > data_json["utilities_btns"]["btn_3"]["values"]["utl_1"]):# tab
+            else:
+                if(times_pressed_utl_5 >= 1):
+                    times_pressed_utl_5 = 0                    
+                    pdi.keyUp(data_json["utilities_btns"]["btn_2"]["keys"][0])
+
+            if datastream[data_json["utilities_btns"]["btn_3"]["id"]] > data_json["utilities_btns"]["btn_3"]["values"]["utl_1"]:# tab
+                times_pressed_utl_6 = add_times_pressed(times_pressed_utl_6)
+                if(times_pressed_utl_6 == 1):
                     pdi.keyDown(data_json["utilities_btns"]["btn_3"]["keys"][0])
-                    datastream = gamepad.read(64)
-                pdi.keyUp(data_json["utilities_btns"]["btn_3"]["keys"][0])
+            else:
+                if(times_pressed_utl_6 >= 1):
+                    times_pressed_utl_6 = 0                  
+                    pdi.keyUp(data_json["utilities_btns"]["btn_3"]["keys"][0])
 
                     
 
