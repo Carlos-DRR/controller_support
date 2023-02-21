@@ -3,16 +3,21 @@ import pydirectinput as pdi
 import pyautogui as pag
 from multiprocessing import Process
 import time
+import json
 
 weight = 7
 tolerance = 2
-screen_offset = 200
+screen_offset = 70
 pag.PAUSE = 0
 
 gamepad = hid.device()
 gamepad.open(0x054c, 0x05c4)
 gamepad.set_nonblocking(True)
 
+f = open("C:/Users/carlo/Desktop/controller_support/config.json")
+data_json = json.load(f)
+
+f.close()
 def check_valid_cursor_direction(axis_x, axis_y):
     screen_width = pag.position()[0]
     screen_height = pag.position()[1]
@@ -32,7 +37,7 @@ def get_mouse_cursor_position():
             #[1] eixo x
             axis_x = 0
             axis_y = 0
-            if datastream[1] > 127 + tolerance:
+            if datastream[data_json["cursor_posistion"]["axis_x"]["id"]] > data_json["cursor_posistion"]["axis_x"]["values"]["no_movement"] + tolerance:
                 axis_x = minmax(datastream[1])
             elif datastream[1] < 127 - tolerance:
                 axis_x = minmax(datastream[1])
@@ -40,10 +45,10 @@ def get_mouse_cursor_position():
             axis_x = int(axis_x * weight)
                 
             #[2] eixo y
-            if datastream[2] > 127 + tolerance:
+            if datastream[data_json["cursor_posistion"]["axis_y"]["id"]] > data_json["cursor_posistion"]["axis_y"]["values"]["no_movement"] + tolerance:
                 axis_y = minmax(datastream[2])
                 
-            elif datastream[2] < 127 - tolerance:
+            elif datastream[data_json["cursor_posistion"]["axis_y"]["id"]] < data_json["cursor_posistion"]["axis_y"]["values"]["no_movement"] - tolerance:
                 axis_y = minmax(datastream[2])
 
             axis_y = int(axis_y * weight)
@@ -58,105 +63,94 @@ def get_clicks():
     while True:
         datastream = gamepad.read(64)
         if datastream:
-            click_r1 = datastream[6] == 2
+
+            click_r1 = datastream[data_json["cursor_btns"]["right_btn"]["id"]] == data_json["cursor_btns"]["right_btn"]["values"]["right_click"]
             if click_r1:
                 pag.mouseDown(button='right')
                 pag.mouseUp(button='right')
                 time.sleep(0.4)
         
-            click_l1 = datastream[6] == 1
+            click_l1 = datastream[data_json["cursor_btns"]["left_btn"]["id"]] == data_json["cursor_btns"]["left_btn"]["values"]["left_click"]
             if click_l1:
                 pag.mouseDown(button='left')
                 pag.mouseUp(button='left')
                 time.sleep(0.4)
 
 def get_skill_buttons():
+    # datastream[data_json["skill_btns"]["btn_1"]["id"]]
     while True:
         datastream = gamepad.read(64)
         if datastream:
-            btn = datastream[5] # 136 ta apertado o triangulo
+            btn = datastream[data_json["skill_btns"]["btn_1"]["id"]] # 136 ta apertado o triangulo
             #print('btn:', datastream[6])
             #datastream[6] F = 64, D = 128
             # 136 ta apertado
             # 24 é quadrado
             # x é 40
             # bolinha é 72
-            
-            match btn:
-                case 40:
-                    pdi.keyDown('w')
-                    pdi.keyUp('w')
-                    #print('w')
-                    #time.sleep(0.15)
-
-                case 24:
-                    pdi.keyDown('q')
-                    pdi.keyUp('q')
-                    #print('q')
-                    #time.sleep(0.15)
-
-                case 136:
-                    pdi.keyDown('r')
-                    pdi.keyUp('r')
-                    #print('r')
-                    #time.sleep(0.15)
-  
-                case 72:
-                    pdi.keyDown('e')
-                    pdi.keyUp('e')
-                    #print('e')
-                    #time.sleep(0.15)
+            if (btn == data_json["skill_btns"]["btn_1"]["values"]["skill_q"]):
+                pdi.keyDown(data_json["skill_btns"]["btn_1"]["keys"][0])
+                pdi.keyUp(data_json["skill_btns"]["btn_1"]["keys"][0])
+            elif (btn == data_json["skill_btns"]["btn_1"]["values"]["skill_w"]):
+                pdi.keyDown(data_json["skill_btns"]["btn_1"]["keys"][1])
+                pdi.keyUp(data_json["skill_btns"]["btn_1"]["keys"][1])
+            elif (btn == data_json["skill_btns"]["btn_1"]["values"]["skill_e"]):
+                pdi.keyDown(data_json["skill_btns"]["btn_1"]["keys"][2])
+                pdi.keyUp(data_json["skill_btns"]["btn_1"]["keys"][2])
+            elif (btn == data_json["skill_btns"]["btn_1"]["values"]["skill_r"]):
+                pdi.keyDown(data_json["skill_btns"]["btn_1"]["keys"][3])
+                pdi.keyUp(data_json["skill_btns"]["btn_1"]["keys"][3])
 
 
 def get_spell_buttons():
     while True:
         datastream = gamepad.read(64)
         if datastream:
-            key = datastream[6]
-            match key:
-                case 64:
-                    pdi.keyDown('d')
-                    pdi.keyUp('d')
-                    time.sleep(0.15)
-
-                case 128:
-                    pdi.keyDown('f')
-                    pdi.keyUp('f')
-                    time.sleep(0.15)
+            #datastream[data_json["spell_btns"]["btn_1"]["id"]]
+            key = datastream[data_json["spell_btns"]["btn_1"]["id"]]
+            if key == data_json["spell_btns"]["btn_1"]["values"]["spell_1"]:
+                pdi.keyDown(data_json["spell_btns"]["btn_1"]["keys"][0])
+                pdi.keyUp(data_json["spell_btns"]["btn_1"]["keys"][0])
+                time.sleep(0.15)
+            elif key == data_json["spell_btns"]["btn_1"]["values"]["spell_2"]:
+                pdi.keyDown(data_json["spell_btns"]["btn_1"]["keys"][1])
+                pdi.keyUp(data_json["spell_btns"]["btn_1"]["keys"][1])
+                time.sleep(0.15)
+                    
 
 def get_utilities():
     while True:
         datastream = gamepad.read(64)
         if datastream:
-            #print(datastream[5]) # 0 é seta pra cima
-            key = datastream[5]
-            match key:
-                case 0: # seta pra cima
-                    pdi.keyDown('4')
-                    pdi.keyUp('4')
-                    time.sleep(0.3)
+            #datastream[data_json["utilities_btns"]["btn_1"]["id"]]
+            key = datastream[data_json["utilities_btns"]["btn_1"]["id"]]
+            if key == data_json["utilities_btns"]["btn_1"]["values"]["arrow_1"]:
+                pdi.keyDown('4')
+                pdi.keyUp('4')
+                time.sleep(0.3)
+            elif key == data_json["utilities_btns"]["btn_1"]["values"]["arrow_2"]:
+                pdi.keyDown('1')
+                pdi.keyUp('1')
+                time.sleep(0.3)
+            elif key == data_json["utilities_btns"]["btn_1"]["values"]["arrow_3"]:
+                pdi.keyDown('b')
+                pdi.keyUp('b')
+                time.sleep(0.3)
+            elif key == data_json["utilities_btns"]["btn_1"]["values"]["arrow_4"]:
+                pdi.keyDown('p')
+                pdi.keyUp('p')
+                time.sleep(0.3)
+            elif key < data_json["utilities_btns"]["btn_2"]["values"]["utl_1"]:
+                while(datastream and datastream[data_json["utilities_btns"]["btn_2"]["id"]] > data_json["utilities_btns"]["btn_2"]["values"]["utl_1"]):# centralizar no personagem (espaço)
+                    pdi.keyDown(data_json["utilities_btns"]["btn_2"]["keys"][0])
+                    datastream = gamepad.read(64)
+                pdi.keyUp(data_json["utilities_btns"]["btn_2"]["keys"][0])
+                while(datastream and datastream[data_json["utilities_btns"]["btn_3"]["id"]] > data_json["utilities_btns"]["btn_3"]["values"]["utl_1"]):# tab
+                    pdi.keyDown(data_json["utilities_btns"]["btn_3"]["keys"][0])
+                    datastream = gamepad.read(64)
+                pdi.keyUp(data_json["utilities_btns"]["btn_3"]["keys"][0])
 
-                case 4: # seta pra baixo
-                    pdi.keyDown('1')
-                    pdi.keyUp('1')
-                    time.sleep(0.3)
-                case 6: # seta esquerda
-                    pdi.keyDown('b')
-                    pdi.keyUp('b')
-                    time.sleep(0.3)
-                case 2: # seta direita
-                    pdi.keyDown('p')
-                    pdi.keyUp('p')
-                    time.sleep(0.3)
-                case _ if key < 20: 
-                    while(datastream and datastream[8] > 20):# centralizar no personagem (espaço)
-                        pdi.keyDown("space")
-                        datastream = gamepad.read(64)
-                    pdi.keyUp("space")
-                    while(datastream and datastream[9] > 20):# tab
-                        pdi.keyDown("tab")
-                        datastream = gamepad.read(64)
-                    pdi.keyUp("tab")
+                    
 
 if __name__ == '__main__': 
     Process(target=get_mouse_cursor_position).start() 

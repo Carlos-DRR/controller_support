@@ -1,0 +1,105 @@
+{
+	"cursor_posistion": {
+		"axis_x": {
+			"id": 1,
+			"values": {
+				"no_movement": 127
+			},
+			"keys": []
+		},
+		"axis_y": {
+			"id": 2,
+			"values": {
+				"no_movement": 127
+			},
+			"keys": []
+		}
+	},
+	"cursor_btns": {
+		"right_btn": {
+			"id": 6,
+			"values": {
+				"right_click": 2
+			},
+			"keys": [
+				"right"
+			]
+		},
+		"left_btn": {
+			"id": 6,
+			"values": {
+				"left_click": 1
+			},
+			"keys": [
+				"left"
+			]
+		}
+	},
+	"skill_btns": {
+		"btn_1": {
+			"id": 5,
+			"values": {
+				"skill_q": 24,
+				"skill_w": 40,
+				"skill_e": 72,
+				"skill_r": 136
+			},
+			"keys": [
+				"q",
+				"w",
+				"e",
+				"r"
+			]
+		}
+	},
+	"spell_btns": {
+		"btn_1": {
+			"id": 6,
+			"values": {
+				"spell_1": 64,
+				"spell_2": 128
+			},
+			"keys": [
+				"d",
+				"f"
+			]
+		}
+	},
+	"utilities_btns": {
+		"btn_1": {
+			"id": 5,
+			"values": {
+				"arrow_1": 0,
+				"arrow_2": 4,
+				"arrow_3": 6,
+				"arrow_4": 2
+			},
+			"keys": [
+				4,
+				1,
+				"b",
+				"p",
+				"space",
+				"tab"
+			]
+		},
+		"btn_2": {
+			"id": 8,
+			"values": {
+				"utl_1": 20
+			},
+			"keys": [
+				"space"
+			]
+		},
+		"btn_3": {
+			"id": 9,
+			"values": {
+				"utl_1": 20
+			},
+			"keys": [
+				"tab"
+			]
+		}
+	}
+}
