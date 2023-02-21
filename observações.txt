@@ -1,1 +1,1 @@
-- corrigir limites na tela pra não extrapolar
+adaptar o código (e/ou config.json) para funcionar com arcade stick também.
