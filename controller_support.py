@@ -41,7 +41,7 @@ def minmax(val):
     maximo = 255
     return 2 * ((val - minimo) / (maximo - minimo)) - 1
 
-def get_mouse_cursor_position():
+def get_left_analog():
     while True:
         datastream = gamepad.read(64)
         if datastream:
@@ -68,6 +68,7 @@ def get_mouse_cursor_position():
             axis_x, axis_y = check_valid_cursor_direction(axis_x, axis_y)
             pag.move(axis_x, axis_y)
 
+
 def add_times_pressed(times_pressed):
     if times_pressed > 1:
         return times_pressed
@@ -75,7 +76,7 @@ def add_times_pressed(times_pressed):
         return times_pressed + 1
 
 
-def get_clicks():
+def get_upper_triggers():
     times_clicked_right = 0
     times_clicked_left = 0
     while True:
@@ -106,7 +107,7 @@ def get_clicks():
                     times_clicked_left = 0
                     pag.mouseUp(button='left')
 
-def get_skill_buttons():
+def get_buttons():
     # datastream[data_json["skill_btns"]["btn_1"]["id"]]
     times_pressed_skill_1 = 0
     times_pressed_skill_2 = 0
@@ -157,7 +158,7 @@ def get_skill_buttons():
                     pdi.keyUp(data_json["skill_btns"]["btn_1"]["keys"][3])
 
 
-def get_spell_buttons():
+def get_analog_buttons():
     times_pressed_spell1 = 0
     times_pressed_spell2 = 0
     while True:
@@ -184,13 +185,11 @@ def get_spell_buttons():
                     pdi.keyUp(data_json["spell_btns"]["btn_1"]["keys"][1])
                     
 
-def get_utilities():        
+def get_d_pad():        
     times_pressed_utl_1 = 0
     times_pressed_utl_2 = 0
     times_pressed_utl_3 = 0
     times_pressed_utl_4 = 0
-    times_pressed_utl_5 = 0
-    times_pressed_utl_6 = 0
     while True:
         datastream = gamepad.read(64)
         if datastream:
@@ -232,30 +231,54 @@ def get_utilities():
                     times_pressed_utl_4 = 0
                     pdi.keyUp('p')
                 
+
+
+
+def get_lower_triggers():
+    times_pressed_utl_1 = 0
+    times_pressed_utl_2 = 0
+
+    while True:
+        datastream = gamepad.read(64)
+        if datastream:
+            #datastream[data_json["utilities_btns"]["btn_1"]["id"]]
             if datastream[data_json["utilities_btns"]["btn_2"]["id"]] > data_json["utilities_btns"]["btn_2"]["values"]["utl_1"]:# centralizar no personagem (espaço)
-                times_pressed_utl_5 = add_times_pressed(times_pressed_utl_5)
-                if(times_pressed_utl_5 == 1):
+                times_pressed_utl_1 = add_times_pressed(times_pressed_utl_1)
+                if(times_pressed_utl_1 == 1):
                     pdi.keyDown(data_json["utilities_btns"]["btn_2"]["keys"][0])
             else:
-                if(times_pressed_utl_5 >= 1):
-                    times_pressed_utl_5 = 0                    
+                if(times_pressed_utl_1 >= 1):
+                    times_pressed_utl_1 = 0                    
                     pdi.keyUp(data_json["utilities_btns"]["btn_2"]["keys"][0])
 
             if datastream[data_json["utilities_btns"]["btn_3"]["id"]] > data_json["utilities_btns"]["btn_3"]["values"]["utl_1"]:# tab
-                times_pressed_utl_6 = add_times_pressed(times_pressed_utl_6)
-                if(times_pressed_utl_6 == 1):
+                times_pressed_utl_2 = add_times_pressed(times_pressed_utl_2)
+                if(times_pressed_utl_2 == 1):
                     pdi.keyDown(data_json["utilities_btns"]["btn_3"]["keys"][0])
             else:
-                if(times_pressed_utl_6 >= 1):
-                    times_pressed_utl_6 = 0                  
-                    pdi.keyUp(data_json["utilities_btns"]["btn_3"]["keys"][0])
+                if(times_pressed_utl_2 >= 1):
+                    times_pressed_utl_2 = 0                
+                    pdi.keyUp(data_json["utilities_btns"]["btn_3"]["keys"][0]) 
 
-                    
 
 if __name__ == '__main__': 
-    Process(target=get_mouse_cursor_position).start() 
-    Process(target=get_clicks).start()
-    Process(target=get_skill_buttons).start()
-    Process(target=get_spell_buttons).start()
-    Process(target=get_utilities).start()
+    cursor = Process(target=get_left_analog)
+    clicks = Process(target=get_upper_triggers)
+    buttons_1 = Process(target=get_buttons)
+    buttons_2 = Process(target=get_analog_buttons)
+    buttons_3 = Process(target=get_d_pad)
+    buttons_4 = Process(target=get_lower_triggers)
 
+    cursor.start()
+    clicks.start()
+    buttons_1.start()
+    buttons_2.start()
+    buttons_3.start()
+    buttons_4.start()
+
+    cursor.join()
+    clicks.join()
+    buttons_1.join()
+    buttons_2.join()
+    buttons_3.join()
+    buttons_4.join()
